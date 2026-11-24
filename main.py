@@ -85,8 +85,21 @@ class IceCreamWindow(QWidget):
     def plot_graph(self):
         self.figure.clear()
         ax = self.figure.add_subplot(111)
-        ax.plot([1, 2, 3], [10, 20, 30])
-        ax.set_title("Temporary Graph")
+
+        if len(self.temperatures) == 0:
+            ax.set_title("Load Ice Cream.csv to view data")
+            self.canvas.draw()
+            return
+
+        ax.scatter(self.temperatures, self.revenues, s=1)
+
+        ax.set_title("Ice Cream Revenue vs. Outside Temperature")
+        ax.set_xlabel("Outside Temperature")
+        ax.set_ylabel("Revenue ($)")
+
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+
         self.canvas.draw()
 
     def about_clicked(self):
