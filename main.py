@@ -1,4 +1,5 @@
 import os
+import numpy as np
 from PySide6.QtWidgets import (
     QApplication, QWidget, QLabel, QPushButton,
     QFileDialog, QVBoxLayout, QHBoxLayout
@@ -41,16 +42,35 @@ class IceCreamWindow(QWidget):
         file_layout = QHBoxLayout()
         file_layout.addWidget(self.load_button)
         file_layout.addWidget(self.file_label)
+        
         file_layout.addStretch()
 
         self.figure = Figure()
         self.canvas = FigureCanvasQTAgg(self.figure)
         self.toolbar = NavigationToolbar2QT(self.canvas, self)
+        self.toolbar.hide()
+
+        self.zoom_button = QPushButton("Zoom: OFF")
+        self.zoom_button.setCheckable(True)
+        self.zoom_button.clicked.connect(self.zoom_clicked)
+
+        self.reset_zoom_button = QPushButton("Reset Zoom")
+        self.reset_zoom_button.clicked.connect(self.reset_zoom_clicked)
+
+        self.save_button = QPushButton("Save Graph")
+        self.save_button.clicked.connect(self.save_clicked)
+
+        tools_layout = QHBoxLayout()
+        tools_layout.addWidget(self.zoom_button)
+        tools_layout.addWidget(self.reset_zoom_button)
+        tools_layout.addWidget(self.save_button)
+        tools_layout.addStretch()
 
         main_layout = QVBoxLayout()
         main_layout.addLayout(header_layout)
         main_layout.addLayout(file_layout)
         main_layout.addWidget(self.toolbar)
+        main_layout.addLayout(tools_layout)
         main_layout.addWidget(self.canvas)
 
         self.setLayout(main_layout)
@@ -93,6 +113,19 @@ class IceCreamWindow(QWidget):
 
         ax.scatter(self.temperatures, self.revenues, s=1)
 
+        ax.scatter(self.temperatures, self.revenues, s=1)
+
+        m, b = np.polyfit(self.temperatures, self.revenues, 1)
+
+        trend = []
+        for x in self.temperatures:
+            trend.append(m * x + b)
+
+        ax.plot(self.temperatures, trend, color="blue")
+
+        equation = f"y = {m:.2f}x + {b:.2f}"
+        ax.text(0.05, 0.90, equation, transform=ax.transAxes, color="blue", fontsize=11)
+
         ax.set_title("Ice Cream Revenue vs. Outside Temperature")
         ax.set_xlabel("Outside Temperature")
         ax.set_ylabel("Revenue ($)")
@@ -108,6 +141,22 @@ class IceCreamWindow(QWidget):
     def closeEvent(self, event):
         self.about_window.close()
 
+    def zoom_clicked(self):
+        self.toolbar.zoom()
+        if self.zoom_button.isChecked():
+            self.zoom_button.setText("Zoom: ON")
+        else:
+            self.zoom_button.setText("Zoom: OFF")
+
+    def reset_zoom_clicked(self):
+        self.toolbar.home()
+        if self.zoom_button.isChecked():
+            self.zoom_button.setChecked(False)
+            self.zoom_button.setText("Zoom: OFF")
+            self.toolbar.zoom()
+
+    def save_clicked(self):
+        self.toolbar.save_figure()
 
 if __name__ == "__main__":
     app = QApplication()
