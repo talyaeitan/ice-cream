@@ -35,6 +35,7 @@ class IceCreamWindow(QWidget):
         header_layout.addWidget(self.about_button)
 
         self.load_button = QPushButton("Load Data File")
+        self.load_button.clicked.connect(self.load_file_clicked)
         self.file_label = QLabel("No file selected")
 
         file_layout = QHBoxLayout()
@@ -53,6 +54,31 @@ class IceCreamWindow(QWidget):
         main_layout.addWidget(self.canvas)
 
         self.setLayout(main_layout)
+
+        self.plot_graph()
+
+    def load_file_clicked(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Select Ice Cream CSV", "", "CSV Files (*.csv)")
+        if file_path == "":
+            return
+
+        self.selected_file = file_path
+        self.file_label.setText(os.path.basename(file_path))
+
+        self.temperatures = []
+        self.revenues = []
+
+        with open(self.selected_file, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        for line in lines[1:]:
+            clean_line = line.strip()
+            if clean_line != "":
+                parts = clean_line.split(",")
+                temp = float(parts[0].strip())
+                rev = float(parts[1].strip())
+                self.temperatures.append(temp)
+                self.revenues.append(rev)
 
         self.plot_graph()
 
