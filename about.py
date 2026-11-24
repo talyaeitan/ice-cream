@@ -32,7 +32,7 @@ class AboutWindow(QWidget):
         self.linkedin_label.setAlignment(Qt.AlignCenter)
         self.linkedin_label.setOpenExternalLinks(True)
 
-        self.github_label = QLabel('<a href="https://github.com/talyaeitan/Grade-Correction.git">Github repository</a>')
+        self.github_label = QLabel('<a href="https://github.com/talyaeitan/ice-cream.git">Github repository</a>')
         self.github_label.setAlignment(Qt.AlignCenter)
         self.github_label.setOpenExternalLinks(True)
 
